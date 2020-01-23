@@ -1,10 +1,12 @@
 --Системные представления и функции
 --SQLOS
-SELECT  cpu_count AS LOGICAL_CPU_COUNT,
-		cpu_count / hyperthread_ratio AS PHYSICAL_CPU_COUNT, 
-		CAST(physical_memory_kb / 1024. AS int) AS PHYSICAL_MEMORY_MB, 
-		sqlserver_start_time --время запуска экзепляра SQL Server
+SELECT  cpu_count AS LOGICAL_CPU_COUNT, --логических процессоров (потоков)
+		hyperthread_ratio, --количество ядер
+		cpu_count / hyperthread_ratio AS PHYSICAL_CPU_COUNT, --физических процессоров
+		CAST(physical_memory_kb / 1024./ 1024. AS int) AS PHYSICAL_MEMORY_GB, --Оперативная память
+		sqlserver_start_time --время установки экзепляра SQL Server
 FROM sys.dm_os_sys_info;
+
 
 
 --активные сессии + блокировки. Сколько потребляют ресурсов
@@ -99,3 +101,6 @@ ORDER BY MIGS.avg_user_impact DESC;
 
 --Индексы. Конец
 --=====================
+
+--Инфо о базах данных сервера
+select * from sys.databases

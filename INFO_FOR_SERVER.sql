@@ -12,7 +12,7 @@ FROM sys.dm_os_sys_info;
 --активные сессии + блокировки. Сколько потребляют ресурсов
 --is_user_process фильтрует системные сеансы 
 select 
-getdate() - s.last_request_start_time AS RUNNING,
+convert(varchar(20),DATEDIFF(ss, s.last_request_start_time, getdate())/3600)+ right( convert(varchar(10), DATEADD(ss,DATEDIFF(ss, s.last_request_start_time, getdate()),0),108),6) AS RUNNING,
 s.session_id, 
 DB_NAME(s.database_id) AS DB,
 s.status,
@@ -63,8 +63,19 @@ ORDER BY (total_logical_reads + total_logical_writes) DESC;
 
 	--список индексов
 	select * from sys.indexes
-	--индексы, которые используются
-	select DB_NAME(database_id), * FROM sys.dm_db_index_usage_stats where database_id<>4 --исключил DB_ID('msdb')
+
+--индексы, которые используются
+select    DB_NAME(us.database_id) as [DB_NAME]
+		, OBJECT_NAME(us.object_id) as [OBJECT_NAME]
+		, i.name as [INDEX_NAME]
+		, i.type_desc as [INDEX_TYPE]
+		, us.user_seeks, us.user_scans, us.user_updates
+		, us.last_user_seek, us.last_user_scan, us.last_user_update
+		--, us.system_seek, us.system_scans, us.system_updates
+		--, us.last_system_seek, us.last_system_scan, us.last_system_update
+FROM sys.dm_db_index_usage_stats as us
+inner join sys.indexes as i on us.index_id=i.index_id and us.object_id=i.object_id
+where database_id<>4 --исключил DB_ID('msdb')
 
 --некластеризованные индексы, которые не используются
 SELECT OBJECT_NAME(I.object_id) AS objectname, I.name AS indexname, I.index_id AS indexid

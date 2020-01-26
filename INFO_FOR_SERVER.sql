@@ -77,10 +77,10 @@ SELECT OBJECT_NAME(I.object_id) AS objectname, I.name AS indexname, I.index_id A
 						AND database_id = DB_ID('TSQL2012')) 
 	ORDER BY objectname, indexname; 
 
-sys.dm_db_missing_index_details
-sys.dm_db_missing_index_columns
-sys.dm_db_missing_index_groups
-sys.dm_db_missing_index_group_stats
+--sys.dm_db_missing_index_details
+--sys.dm_db_missing_index_columns
+--sys.dm_db_missing_index_groups
+--sys.dm_db_missing_index_group_stats
 
 --Поиск недостающих индексов:
 	SELECT

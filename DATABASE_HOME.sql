@@ -108,4 +108,10 @@ GO
 ALTER DATABASE [HOME] SET  READ_WRITE 
 GO
 
+--добавляем необходимые схемы
+USE [HOME]
+GO
+
+CREATE SCHEMA [buf]
+GO
 

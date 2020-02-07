@@ -7,7 +7,7 @@ BEGIN TRY
 
 	IF @MAX_DATE is null
 	BEGIN
-		SELECT @MAX_DATE = [DATE] FROM dbo.TBL_EXPENSES;
+		SELECT @MAX_DATE = MAX([DATE]) FROM dbo.TBL_EXPENSES;
 	END
 
 	IF @MAX_DATE is null
@@ -17,7 +17,6 @@ BEGIN TRY
 
 
 	DROP TABLE IF EXISTS #BUF;
-
 	--набираем временную таблицу с данными из буфера с ограничением по дате последней загрузки
 	--проставляем ID категории
 	SELECT e.[DATE]
@@ -27,12 +26,18 @@ BEGIN TRY
 	into #BUF
 	FROM buf.TBL_EXPENSES as e
 	LEFT JOIN dbo.DIC_CATEGORY as c on e.CATEGORY = c.CATEGORY
-	WHERE [DATE] >= @MAX_DATE;
+	WHERE e.[DATE] >= @MAX_DATE 
+			and not exists (select * 
+							from dbo.TBL_EXPENSES as trg 
+							where		trg.[DATE] = e.[DATE] 
+									and trg.[NAME] = e.[NAME] 
+									and trg.PRICE = e.PRICE
+							); --чтобы избежать дублей при повторных запускать на старых данных
 
 
 	IF not exists (select TOP(1) 1 from #BUF)
 	BEGIN
-		;THROW 50000, 'Отсутствуют новые даты для загрузки', 1;
+		;THROW 50000, 'Отсутствуют новые данные для загрузки', 1;
 	END
 
 	--UPDATE trg

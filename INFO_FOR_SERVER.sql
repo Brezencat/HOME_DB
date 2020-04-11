@@ -110,6 +110,22 @@ INNER JOIN sys.dm_db_missing_index_groups AS MIG ON MIG.index_handle=MID.index_h
 INNER JOIN sys.dm_db_missing_index_group_stats AS MIGS ON MIG.index_group_handle=MIGS.group_handle 
 ORDER BY MIGS.avg_user_impact DESC;
 
+--Уроыень индексов, строки и страницы. Фрагментация
+--внешняя фрагментация < 30% - реорганизация, > 30% - перестроение индекса
+SELECT index_type_desc
+	, index_depth
+	, index_level						--уровень индекса
+	, page_count						--количество страниц на уровне
+	, record_count						--количество строк
+	, avg_page_space_used_in_percent 	--внутренняя фрагментация
+	, avg_fragmentation_in_percent		--внешняя фрагментация
+FROM sys.dm_db_index_physical_stats (DB_ID(N'tempdb'), OBJECT_ID(N'dbo.TestStructure'), NULL, NULL , 'DETAILED');
+
+--Выделенная и фактически использованая память для таблицы + размер индекса
+EXEC dbo.sp_spaceused @objname = N'dbo.TestStructure', @updateusage = true;
+
+
+
 --Индексы. Конец
 --=====================
 

@@ -24,7 +24,7 @@ BEGIN TRY
 		 , e.PRICE
 		 , ISNULL(c.ID_CATEGORY, -1) as ID_CATEGORY
 	into #BUF
-	FROM buf.TBL_EXPENSES as e
+	FROM stg.TBL_EXPENSES as e
 	LEFT JOIN dbo.DIC_CATEGORY as c on e.CATEGORY = c.CATEGORY
 	WHERE e.[DATE] >= @MAX_DATE 
 			and not exists (select * 
